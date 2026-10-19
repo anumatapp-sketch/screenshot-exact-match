@@ -42,6 +42,7 @@ let profile: Profile = { name: "Chanthy Pich", email: "chanthy@anumat.example", 
 
 export async function fetchProfile() {
   await wait(300);
+  if (shouldFail()) throw new Error("Mock network error");
   return { ...profile };
 }
 export async function saveProfile(p: Profile) {
@@ -57,4 +58,4 @@ export const requestsQuery = queryOptions({
 });
 export const requestQuery = (id: string) =>
   queryOptions({ queryKey: ["requests", id], queryFn: () => fetchRequest(id) });
-export const profileQuery = queryOptions({ queryKey: ["profile"], queryFn: fetchProfile });
+export const profileQuery = queryOptions({ queryKey: ["profile"], queryFn: fetchProfile, retry: false });
