@@ -7,7 +7,7 @@ type MockLinkProps = {
   to?: string;
   children?: ReactNode;
   className?: string;
-  activeProps?: { className?: string; "aria-current"?: string };
+   activeProps?: { className?: string; "aria-current"?: ComponentProps<"a">["aria-current"] };
   activeOptions?: { exact?: boolean };
 } & ComponentProps<"a">;
 
@@ -61,6 +61,7 @@ describe("AppShell (A-01, G-02, G-07, T-NAV-01)", () => {
     expect(navs.length).toBe(2); // desktop + mobile
 
     const mobileNav = navs[1];
+     if (!mobileNav) throw new Error("Mobile navigation missing");
     expect(mobileNav).toHaveClass("md:hidden");
 
     // "Today" is active in our mock

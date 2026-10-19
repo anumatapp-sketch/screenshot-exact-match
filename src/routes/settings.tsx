@@ -107,10 +107,10 @@ function ProfileForm({ initial }: { initial: Profile }) {
             value={form.digest}
             onValueChange={(v) => setForm({ ...form, digest: v as Profile["digest"] })}
           >
-            {[
+             {([
               ["instant", "As soon as something needs me"],
               ["daily", "Once a day, in a summary"],
-             ].map(([v, l]) => (
+             ] as const).map(([v, l]) => (
               <Label
                 key={v}
                 htmlFor={`d-${v}`}
