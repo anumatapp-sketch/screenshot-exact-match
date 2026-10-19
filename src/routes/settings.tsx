@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/app-shell";
-import { InlineError, ListSkeleton } from "@/components/feedback";
+import { EmptyState, InlineError, ListSkeleton } from "@/components/feedback";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,12 +29,23 @@ export const Route = createFileRoute("/settings")({
 });
 
 function SettingsPage() {
-  const { data, isPending } = useQuery(profileQuery);
+  const { data, isPending, isError, isFetching, refetch } = useQuery(profileQuery);
   return (
     <AppShell>
       <h1 className="font-display text-4xl font-semibold tracking-tight">Settings</h1>
       <div className="mt-6 max-w-xl">
-        {isPending || !data ? <ListSkeleton rows={2} /> : <ProfileForm initial={data} />}
+        {isError ? (
+          <EmptyState
+            variant="error"
+            title="Settings didn't load"
+            description="Check your connection, then try again."
+            action={
+              <Button variant="outline" className="h-11" disabled={isFetching} onClick={() => refetch()}>
+                {isFetching ? "Retrying…" : "Retry"}
+              </Button>
+            }
+          />
+        ) : isPending || !data ? <ListSkeleton rows={2} /> : <ProfileForm initial={data} />}
       </div>
     </AppShell>
   );
@@ -107,10 +118,10 @@ function ProfileForm({ initial }: { initial: Profile }) {
             value={form.digest}
             onValueChange={(v) => setForm({ ...form, digest: v as Profile["digest"] })}
           >
-            {[
+             {([
               ["instant", "As soon as something needs me"],
               ["daily", "Once a day, in a summary"],
-            ].map(([v, l]) => (
+             ] as const).map(([v, l]) => (
               <Label
                 key={v}
                 htmlFor={`d-${v}`}

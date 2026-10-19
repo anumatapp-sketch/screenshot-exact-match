@@ -114,4 +114,19 @@ describe("Settings form (T-FORM-01, T-FORM-02, A-05)", () => {
       expect(screen.getByText("All changes saved")).toBeInTheDocument();
     });
   });
+
+  it("recovers from a failed profile load when Retry succeeds", async () => {
+    window.history.replaceState({}, "", "/settings?fail=1");
+    try {
+      const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+      renderWithQuery(queryClient);
+      const retry = await screen.findByRole("button", { name: "Retry" });
+      expect(screen.queryByLabelText("Full name")).not.toBeInTheDocument();
+      window.history.replaceState({}, "", "/settings");
+      fireEvent.click(retry);
+      expect(await screen.findByLabelText("Full name")).toBeInTheDocument();
+    } finally {
+      window.history.replaceState({}, "", "/");
+    }
+  });
 });
