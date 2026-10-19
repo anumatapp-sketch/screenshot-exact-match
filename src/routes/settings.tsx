@@ -110,7 +110,7 @@ function ProfileForm({ initial }: { initial: Profile }) {
             {[
               ["instant", "As soon as something needs me"],
               ["daily", "Once a day, in a summary"],
-            ].map(([v, l]) => (
+             ].map(([v, l]) => (
               <Label
                 key={v}
                 htmlFor={`d-${v}`}
