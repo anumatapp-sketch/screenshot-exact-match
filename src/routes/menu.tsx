@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronRight, Settings, FileText, Inbox } from "lucide-react";
+import { ChevronRight, Settings, FileText, Inbox, Layers } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 
 export const Route = createFileRoute("/menu")({
@@ -19,6 +19,7 @@ export const Route = createFileRoute("/menu")({
 const ITEMS = [
   { to: "/", label: "Today", hint: "What needs you now", icon: Inbox },
   { to: "/requests", label: "Requests", hint: "Every request, by status", icon: FileText },
+  { to: "/templates", label: "Request types", hint: "Templates, forms and workflows", icon: Layers },
   { to: "/settings", label: "Settings", hint: "Profile and notifications", icon: Settings },
 ] as const;
 
