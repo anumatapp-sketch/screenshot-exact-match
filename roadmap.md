@@ -6,3 +6,4 @@
  - [ ] Add mock Request types, Forms, and Workflows workspaces from the uploaded authoring guide.
  - [ ] Add quick-start composition, live preview, step inspector, and mock route testing.
  - [ ] Verify authoring flows, existing tests, and phone layouts.
+- [ ] Restore missing authoring routes and connect desktop and Menu navigation.
