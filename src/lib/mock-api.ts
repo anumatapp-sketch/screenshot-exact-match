@@ -1,6 +1,7 @@
 // Mock data layer. Swap these functions for real API calls later; UI only depends on their shapes.
 import { queryOptions } from "@tanstack/react-query";
 import { REQUESTS, type Request, type RequestStatus } from "./requests";
+import { PRESETS, cloneType, type RequestType } from "./authoring";
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const db: Request[] = REQUESTS.map((r) => ({ ...r, chain: r.chain.map((s) => ({ ...s })) }));
@@ -59,3 +60,23 @@ export const requestsQuery = queryOptions({
 export const requestQuery = (id: string) =>
   queryOptions({ queryKey: ["requests", id], queryFn: () => fetchRequest(id) });
 export const profileQuery = queryOptions({ queryKey: ["profile"], queryFn: fetchProfile, retry: false });
+
+let requestTypes = PRESETS.map(cloneType);
+export const authoringQuery = queryOptions({
+  queryKey: ["request-types"],
+  queryFn: async () => {
+    await wait(300);
+    if (shouldFail()) throw new Error("Mock network error");
+    return requestTypes.map(cloneType);
+  },
+  retry: false,
+});
+export async function saveRequestType(value: RequestType) {
+  await wait(400);
+  if (shouldFail()) throw new Error("Mock network error");
+  const copy = cloneType(value);
+  requestTypes = requestTypes.some(item => item.id === copy.id)
+    ? requestTypes.map(item => item.id === copy.id ? copy : item)
+    : [...requestTypes, copy];
+  return requestTypes.map(cloneType);
+}

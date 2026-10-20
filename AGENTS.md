@@ -10,3 +10,6 @@
 > the editor, so keep the branch in a working state.
 
 <!-- LOVABLE:END -->
+
+- Authoring uses a shared workspace across the Templates, Forms, and Workflows leaf routes so edits share the same request-type model.
+- Mock request types use an in-memory API and React Query cache; never persist demo changes or alter live approval data.

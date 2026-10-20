@@ -1,10 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { Inbox, FileText, Menu, Settings } from "lucide-react";
+import { Inbox, FileText, Menu, Settings, Layers } from "lucide-react";
 import type { ReactNode } from "react";
 
 const DESKTOP_NAV = [
   { to: "/", label: "Today", icon: Inbox },
   { to: "/requests", label: "Requests", icon: FileText },
+  { to: "/templates", label: "Request types", icon: Layers },
   { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
 

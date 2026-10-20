@@ -10,14 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FormsRouteImport } from './routes/forms'
 import { Route as MenuRouteImport } from './routes/menu'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as TemplatesRouteImport } from './routes/templates'
+import { Route as WorkflowsRouteImport } from './routes/workflows'
 import { Route as RequestsIndexRouteImport } from './routes/requests.index'
 import { Route as RequestsIdRouteImport } from './routes/requests.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FormsRoute = FormsRouteImport.update({
+  id: '/forms',
+  path: '/forms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MenuRoute = MenuRouteImport.update({
@@ -28,6 +36,16 @@ const MenuRoute = MenuRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemplatesRoute = TemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkflowsRoute = WorkflowsRouteImport.update({
+  id: '/workflows',
+  path: '/workflows',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RequestsIndexRoute = RequestsIndexRouteImport.update({
@@ -43,38 +61,75 @@ const RequestsIdRoute = RequestsIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/forms': typeof FormsRoute
   '/menu': typeof MenuRoute
   '/settings': typeof SettingsRoute
+  '/templates': typeof TemplatesRoute
+  '/workflows': typeof WorkflowsRoute
   '/requests/$id': typeof RequestsIdRoute
   '/requests/': typeof RequestsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/forms': typeof FormsRoute
   '/menu': typeof MenuRoute
   '/settings': typeof SettingsRoute
+  '/templates': typeof TemplatesRoute
+  '/workflows': typeof WorkflowsRoute
   '/requests/$id': typeof RequestsIdRoute
   '/requests': typeof RequestsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/forms': typeof FormsRoute
   '/menu': typeof MenuRoute
   '/settings': typeof SettingsRoute
+  '/templates': typeof TemplatesRoute
+  '/workflows': typeof WorkflowsRoute
   '/requests/$id': typeof RequestsIdRoute
   '/requests/': typeof RequestsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/menu' | '/settings' | '/requests/$id' | '/requests/'
+  fullPaths:
+    | '/'
+    | '/forms'
+    | '/menu'
+    | '/settings'
+    | '/templates'
+    | '/workflows'
+    | '/requests/$id'
+    | '/requests/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/menu' | '/settings' | '/requests/$id' | '/requests'
-  id: '__root__' | '/' | '/menu' | '/settings' | '/requests/$id' | '/requests/'
+  to:
+    | '/'
+    | '/forms'
+    | '/menu'
+    | '/settings'
+    | '/templates'
+    | '/workflows'
+    | '/requests/$id'
+    | '/requests'
+  id:
+    | '__root__'
+    | '/'
+    | '/forms'
+    | '/menu'
+    | '/settings'
+    | '/templates'
+    | '/workflows'
+    | '/requests/$id'
+    | '/requests/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  FormsRoute: typeof FormsRoute
   MenuRoute: typeof MenuRoute
   SettingsRoute: typeof SettingsRoute
+  TemplatesRoute: typeof TemplatesRoute
+  WorkflowsRoute: typeof WorkflowsRoute
   RequestsIdRoute: typeof RequestsIdRoute
   RequestsIndexRoute: typeof RequestsIndexRoute
 }
@@ -86,6 +141,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forms': {
+      id: '/forms'
+      path: '/forms'
+      fullPath: '/forms'
+      preLoaderRoute: typeof FormsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/menu': {
@@ -100,6 +162,20 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/templates': {
+      id: '/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof TemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/workflows': {
+      id: '/workflows'
+      path: '/workflows'
+      fullPath: '/workflows'
+      preLoaderRoute: typeof WorkflowsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/requests/': {
@@ -121,8 +197,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  FormsRoute: FormsRoute,
   MenuRoute: MenuRoute,
   SettingsRoute: SettingsRoute,
+  TemplatesRoute: TemplatesRoute,
+  WorkflowsRoute: WorkflowsRoute,
   RequestsIdRoute: RequestsIdRoute,
   RequestsIndexRoute: RequestsIndexRoute,
 }
