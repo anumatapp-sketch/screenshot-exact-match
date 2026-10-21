@@ -130,7 +130,7 @@ function RequestForm({ type, onBack }: { type: RequestType; onBack: () => void }
     e.preventDefault();
     if (m.isPending) return;
     const next: Record<string, string> = {};
-    if (!title.trim()) next.title = "Give your request a short title.";
+    if (!title.trim()) next["title"] = "Give your request a short title.";
     for (const f of type.fields) {
       const v = (values[f.id] ?? "").trim();
       if (!v) next[f.id] = `Enter ${f.label.toLowerCase()}.`;
@@ -154,13 +154,13 @@ function RequestForm({ type, onBack }: { type: RequestType; onBack: () => void }
             Change type
           </Button>
         </div>
-        <Field id="rq-title" label="Title" error={errors.title}>
+        <Field id="rq-title" label="Title" error={errors["title"]}>
           <Input
             id="rq-title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            aria-invalid={!!errors.title}
-            aria-describedby={errors.title ? "rq-title-err" : undefined}
+            aria-invalid={!!errors["title"]}
+            aria-describedby={errors["title"] ? "rq-title-err" : undefined}
             className="h-11"
           />
         </Field>
@@ -205,7 +205,7 @@ function RequestForm({ type, onBack }: { type: RequestType; onBack: () => void }
   );
 }
 
-function Field({ id, label, error, children }: { id: string; label: string; error?: string; children: React.ReactNode }) {
+function Field({ id, label, error, children }: { id: string; label: string; error?: string | undefined; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
       <Label htmlFor={id}>{label}</Label>

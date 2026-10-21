@@ -33,7 +33,8 @@ export async function decideRequest(id: string, decision: Decision, comment?: st
   const step = r.chain.find((s) => s.state === "current");
   if (step) {
     step.state = decision === "approve" ? "done" : decision === "reject" ? "rejected" : "waiting";
-    step.at = decision === "changes" ? undefined : "Just now";
+    if (decision === "changes") delete step.at;
+    else step.at = "Just now";
   }
   const verb = { approve: "Approved", reject: "Rejected", changes: "Asked for changes" }[decision];
   r.activity = [

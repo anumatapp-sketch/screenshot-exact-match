@@ -95,7 +95,7 @@ describe("Request detail (Phase 3, Phase 6, G-08, G-09, G-10)", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("Please give a reason so the requester knows what to fix."),
+        screen.getByText("Please add a comment so the requester knows what to fix."),
       ).toBeInTheDocument();
       expect(screen.getByLabelText("Reason (required)")).toHaveAttribute("aria-invalid", "true");
       expect(screen.getByLabelText("Reason (required)")).toHaveAttribute(
