@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/sheet";
 import { confirmDiscard, useUnsavedChangesGuard } from "@/hooks/use-unsaved-changes-guard";
 import { decideRequest, requestQuery } from "@/lib/mock-api";
-import { formatMoney, type Request } from "@/lib/requests";
+import { decisionCommentError, formatMoney, type Decision, type Request } from "@/lib/requests";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/requests/$id")({
@@ -51,6 +51,7 @@ const SECTIONS = [
   { id: "summary", label: "Summary" },
   { id: "items", label: "Line items" },
   { id: "chain", label: "Approval chain" },
+  { id: "activity", label: "Activity" },
 ] as const;
 
 function Detail() {
@@ -100,22 +101,24 @@ function Detail() {
 
 function RequestView({ r }: { r: Request }) {
   const qc = useQueryClient();
-  const [dialog, setDialog] = useState<null | "approve" | "reject">(null);
+  const [dialog, setDialog] = useState<null | Decision>(null);
   const [reason, setReason] = useState("");
-  const [err, setErr] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
   const isSubmitting = useRef(false);
   const canDecide = r.needsMe && r.status === "in_review";
   const total = r.lines.reduce((s, l) => s + l.qty * l.price, 0);
 
   // Guard against navigating away with unsaved rejection reason text
-  useUnsavedChangesGuard(dialog === "reject" && reason.trim().length > 0);
+  useUnsavedChangesGuard(!!dialog && reason.trim().length > 0);
 
   const m = useMutation({
-    mutationFn: (v: { d: "approve" | "reject"; reason?: string | undefined }) =>
+    mutationFn: (v: { d: Decision; reason?: string | undefined }) =>
       decideRequest(r.id, v.d, v.reason),
     onSuccess: (_, v) => {
       qc.invalidateQueries({ queryKey: ["requests"] });
-      toast.success(v.d === "approve" ? `${r.id} approved` : `${r.id} rejected`);
+      toast.success(
+        v.d === "approve" ? `${r.id} approved` : v.d === "reject" ? `${r.id} rejected` : `Changes requested on ${r.id}`,
+      );
       setDialog(null);
       setReason("");
     },
@@ -124,8 +127,9 @@ function RequestView({ r }: { r: Request }) {
 
   const confirm = () => {
     if (m.isPending || isSubmitting.current || !dialog) return;
-    if (dialog === "reject" && !reason.trim()) {
-      setErr(true);
+    const e = decisionCommentError(dialog, reason);
+    if (e) {
+      setErr(e);
       return;
     }
     isSubmitting.current = true;
@@ -140,7 +144,7 @@ function RequestView({ r }: { r: Request }) {
   };
   const closeDialog = (open: boolean) => {
     if (open || m.isPending) return;
-    if (dialog === "reject" && !confirmDiscard(reason.trim().length > 0)) return;
+    if (!confirmDiscard(reason.trim().length > 0)) return;
     setDialog(null);
   };
 
@@ -209,6 +213,23 @@ function RequestView({ r }: { r: Request }) {
               </li>
             </ul>
           </section>
+          <section id="activity" className="scroll-mt-6 rounded-2xl border bg-card p-5 shadow-card">
+            <h2 className="font-semibold">Activity</h2>
+            {r.activity?.length ? (
+              <ol className="mt-3 space-y-3 text-sm">
+                {r.activity.map((a, i) => (
+                  <li key={i}>
+                    <p>
+                      <span className="font-medium">{a.who}</span> {a.text}
+                    </p>
+                    <p className="text-muted-foreground">{a.at}</p>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className="mt-2 text-sm text-muted-foreground">No comments yet.</p>
+            )}
+          </section>
           {/* Compact: chain opens in a sheet */}
           <Sheet>
             <SheetTrigger asChild>
@@ -243,18 +264,34 @@ function RequestView({ r }: { r: Request }) {
       </div>
 
       {canDecide && (
-        <div className="sticky bottom-16 z-30 mt-8 flex gap-3 rounded-2xl border bg-card p-3 shadow-card md:bottom-4">
+        <div className="sticky bottom-16 z-30 mt-8 flex flex-wrap gap-3 rounded-2xl border bg-card p-3 shadow-card md:bottom-4">
           <Button
             variant="outline"
             className="h-11 flex-1"
             onClick={() => {
-              setErr(false);
+              setErr(null);
               setDialog("reject");
             }}
           >
             Reject
           </Button>
-          <Button className="h-11 flex-1" onClick={() => setDialog("approve")}>
+          <Button
+            variant="outline"
+            className="h-11 flex-1"
+            onClick={() => {
+              setErr(null);
+              setDialog("changes");
+            }}
+          >
+            Request changes
+          </Button>
+          <Button
+            className="h-11 flex-1"
+            onClick={() => {
+              setErr(null);
+              setDialog("approve");
+            }}
+          >
             Approve {formatMoney(r.amount)}
           </Button>
         </div>
@@ -264,32 +301,35 @@ function RequestView({ r }: { r: Request }) {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {dialog === "approve" ? "Approve" : "Reject"} {r.id}?
+              {dialog === "approve" ? "Approve" : dialog === "reject" ? "Reject" : "Request changes on"}{" "}
+              {r.id}?
             </AlertDialogTitle>
             <AlertDialogDescription>
               {r.title} · {formatMoney(r.amount)}.{" "}
               {dialog === "approve"
-                ? "It moves to the next approver."
-                : "The requester will see your reason."}
+                ? "It moves to the next approver. Decisions are final."
+                : dialog === "reject"
+                  ? "This ends the request. The requester will see your reason."
+                  : "It goes back to the requester to edit and resubmit."}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          {dialog === "reject" && (
+          {dialog && (
             <div className="space-y-2">
-              <Label htmlFor="reason">Reason (required)</Label>
+              <Label htmlFor="reason">
+                {dialog === "approve" ? "Comment (optional)" : "Reason (required)"}
+              </Label>
               <Textarea
                 id="reason"
                 value={reason}
                 onChange={(e) => {
                   setReason(e.target.value);
-                  setErr(false);
+                  setErr(null);
                 }}
-                aria-invalid={err}
+                aria-invalid={!!err}
                 aria-describedby={err ? "reason-err" : undefined}
               />
               {err && (
-                <InlineError id="reason-err">
-                  Please give a reason so the requester knows what to fix.
-                </InlineError>
+<InlineError id="reason-err">{err}</InlineError>
               )}
             </div>
           )}
@@ -303,7 +343,13 @@ function RequestView({ r }: { r: Request }) {
               disabled={m.isPending}
               onClick={confirm}
             >
-              {m.isPending ? "Saving…" : dialog === "approve" ? "Approve" : "Reject"}
+              {m.isPending
+                ? "Saving…"
+                : dialog === "approve"
+                  ? "Approve"
+                  : dialog === "reject"
+                    ? "Reject"
+                    : "Send back"}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
