@@ -8,7 +8,7 @@ export const STATUS_META: Record<RequestStatus, { label: string; tone: Tone }> =
   in_review: { label: "In review", tone: "warning" },
   approved: { label: "Approved", tone: "success" },
   rejected: { label: "Rejected", tone: "danger" },
-  returned: { label: "Returned", tone: "warning" },
+  returned: { label: "Changes requested", tone: "warning" },
 };
 
 export const STATUS_ORDER: RequestStatus[] = [
@@ -43,6 +43,7 @@ export type Request = {
   summary: string;
   lines: { item: string; qty: number; price: number }[];
   chain: ApprovalStep[];
+  activity?: ActivityEntry[];
 };
 
 // Demo data only.
@@ -192,3 +193,15 @@ export const formatMoney = (n: number, c = "USD") =>
   }).format(n);
 
 export const getRequest = (id: string) => REQUESTS.find((r) => r.id === id);
+
+export type Decision = "approve" | "reject" | "changes";
+export type ActivityEntry = { who: string; text: string; at: string };
+
+/** Approve: comment optional. Reject / request changes: comment required, at least 3 characters. */
+export function decisionCommentError(decision: Decision, comment: string): string | null {
+  if (decision === "approve") return null;
+  const c = comment.trim();
+  if (!c) return "Please add a comment so the requester knows what to fix.";
+  if (c.length < 3) return "Comment must be at least 3 characters.";
+  return null;
+}
