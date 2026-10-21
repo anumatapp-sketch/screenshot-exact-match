@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
@@ -6,7 +6,7 @@ import { AppShell } from "@/components/app-shell";
 import { EmptyState, ListSkeleton } from "@/components/feedback";
 import { ResponsiveDataView, type Sort, type SortKey } from "@/components/responsive-data-view";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { requestsQuery } from "@/lib/mock-api";
 
 export const Route = createFileRoute("/requests/")({
@@ -96,7 +96,12 @@ function Requests() {
 
   return (
     <AppShell>
-      <h1 className="font-display text-4xl font-semibold tracking-tight">Requests</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-display text-4xl font-semibold tracking-tight">Requests</h1>
+        <Link to="/requests/new" className={buttonVariants({ className: "h-11" })}>
+          New request
+        </Link>
+      </div>
       <div className="relative mt-6 max-w-md">
         <Search
           className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
