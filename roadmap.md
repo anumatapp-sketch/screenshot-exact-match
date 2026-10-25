@@ -12,3 +12,10 @@
 - [x] Activity history on request page
 - [x] Demo New request flow with live approver preview
 - [ ] Inbox quick/bulk approve, cancel/resubmit, drafts autosave (next)
+  - Deferred: separate request lifecycle work, outside this workflow authoring update.
+
+## Non-technical workflow authoring (mock adaptation)
+- [ ] Plain-language approval summaries and field-linked correction notices.
+- [ ] Test unsaved approval routes at amount boundaries and preview decision outcomes.
+- [ ] Publish checklist, session-only test cases, and desktop/phone verification.
+- Live simulation APIs, version switching, cross-device drafts, and native Khmer review require a separate live-product request or reviewer.
