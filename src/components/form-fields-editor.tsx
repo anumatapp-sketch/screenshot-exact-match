@@ -15,7 +15,7 @@ export function FormFieldsEditor({ fields, onChange }: { fields: FormField[]; on
     next[index + delta] = current;
     onChange(next);
   }
-  return <section className="space-y-4" aria-label="Form fields">
+  return <section id="authoring-fields" tabIndex={-1} className="space-y-4" aria-label="Form fields">
     <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="font-semibold">Form fields</h3><Button variant="outline" onClick={() => onChange([...fields, { id: newId(), label: "", type: "text" }])}><Plus className="size-4" />Add field</Button></div>
     {fields.length === 0 && <p className="text-sm text-muted-foreground">No fields yet</p>}
     {fields.map((field, index) => <div key={field.id} className="space-y-3 rounded-lg border bg-card p-3">
