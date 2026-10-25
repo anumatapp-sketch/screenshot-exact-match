@@ -13,3 +13,4 @@
 
 - Authoring uses a shared workspace across the Templates, Forms, and Workflows leaf routes so edits share the same request-type model.
 - Mock request types use an in-memory API and React Query cache; never persist demo changes or alter live approval data.
+- Draft authoring checks are pure browser-safe functions shared by field-level guidance and the session-only route tester, so testing and publishing inspect the same unsaved model.
